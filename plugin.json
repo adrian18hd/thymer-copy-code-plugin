@@ -1,0 +1,6 @@
+{
+	"ver": 1,
+	"name": "Copy Code",
+	"icon": "clipboard-text",
+	"description": "Adds a copy button to each code block in the editor."
+}
