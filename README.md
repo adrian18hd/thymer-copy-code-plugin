@@ -12,13 +12,6 @@ This is a single-file plugin — no build step. In Thymer → your plugin → **
 1. Paste the contents of [`plugin.js`](./plugin.js) into the **Custom Code** tab.
 2. Paste the contents of [`plugin.json`](./plugin.json) into the **Configuration** tab.
 
-`plugin.js` uses `class Plugin` (no `export`), because the Custom Code field
-evaluates plain script — `export`/`import` would throw `unexpected token 'export'`.
-
-> Want live reload instead of copy-paste? The official
-> [Thymer Plugin SDK](https://github.com/thymerapp/thymer-plugin-sdk) provides an
-> esbuild + hot-reload setup (it expects `export class Plugin`). See CLAUDE.md.
-
 ## How it works
 
 Thymer has no API to render UI on a specific line item inside a document, so this
