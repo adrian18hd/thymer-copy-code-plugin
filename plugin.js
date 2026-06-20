@@ -26,16 +26,21 @@
 // Thymer editor DOM (observed; classes are undocumented and may change builds)
 // ---------------------------------------------------------------------------
 //   .listitem.listitem-block                       outer wrapper (has data-guid)
-//     .block-container-div.block-codelang          <- the code block (our target)
-//          [ns-type="bash"] [.block-lang-bash]     language
+//     .block-container-div                          <- the code block (our target)
+//          [ns-type="bash"] [.block-lang-bash]     language (only when one is set)
+//          [.block-codelang]                        present ONLY when a language is set
 //       .listitem.listitem-text > .line-div > .lineitem-text   one code line
 //       .listitem.listitem-br   ...                blank line
-//       .block-nstype-button                       the little "bash" label/handle
+//       .block-nstype-button                       the little "bash"/"block" label/handle
 //   .lineitem-code                                 <- inline code span
-// Non-code blocks (quote/note/warning) lack `.block-codelang`, so this selector
-// matches code blocks only. If a future build renames it, update this constant
-// (see CLAUDE.md -> "Inspecting the document model").
-const CODE_BLOCK_SELECTOR = '.block-codelang';
+// We match the code block via its `.listitem-block` wrapper (the dedicated
+// code-block line-item type), NOT `.block-codelang`: a code block with no
+// language set renders WITHOUT `.block-codelang` (ns-type="block",
+// .block-style-plain), so keying off the language class skipped those blocks.
+// Quote/note/warning blocks use other wrappers (e.g. .listitem-quote), so this
+// selector still excludes them. If a future build renames these, update this
+// constant (see CLAUDE.md -> "The code-block DOM (observed)").
+const CODE_BLOCK_SELECTOR = '.listitem-block > .block-container-div';
 const INLINE_CODE_SELECTOR = '.lineitem-code';
 
 const BTN_CLASS = 'copy-code-btn';

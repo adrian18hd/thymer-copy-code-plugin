@@ -60,6 +60,7 @@ Both share `copyText()` (clipboard write + error toaster) and a transient `ti ti
 Confirmed against the live app (classes are undocumented; re-verify if a build renames them):
 
 ```html
+<!-- Code block WITH a language: -->
 <div class="listitem listitem-block" data-guid="…">
   <div class="block-container-div container-border block-codelang block-lang-bash block-style-plain" ns-type="bash">
     <div class="listitem listitem-text" data-guid="…"><div class="line-div"><span class="lineitem-text">grep <span class="hljs-string">"Accepted"</span> /var/log/auth.log</span></div></div>
@@ -68,14 +69,22 @@ Confirmed against the live app (classes are undocumented; re-verify if a build r
     <span class="block-nstype-button">bash</span>   <!-- language label / drag handle -->
   </div>
 </div>
+
+<!-- Code block with NO language: no `.block-codelang`, no `.block-lang-*`, ns-type="block" -->
+<div class="listitem listitem-block" data-guid="…">
+  <div class="block-container-div container-border block-style-plain" ns-type="block">
+    <div class="listitem listitem-text" data-guid="…"><div class="line-div"><span class="lineitem-text">dotnet ef migrations add InitialCreate</span></div></div>
+    <span class="block-nstype-button">block</span>
+  </div>
+</div>
 ```
 
-- **`CODE_BLOCK_SELECTOR = '.block-codelang'`** — the bordered inner container; unique to code blocks (quote/note/warning blocks lack it).
+- **`CODE_BLOCK_SELECTOR = '.listitem-block > .block-container-div'`** — the bordered inner container of a code block. We key off the **`.listitem-block` wrapper** (the dedicated code-block line-item type), **not `.block-codelang`**: a code block with no language set renders *without* `.block-codelang` (ns-type="block", `.block-style-plain`), so the old `.block-codelang` selector silently skipped those blocks (the "Copy button stopped showing" bug). Quote/note/warning blocks use other wrappers (e.g. `.listitem-quote`), so `.listitem-block` still excludes them.
 - Each code line is a **direct-child `.listitem`**; `.listitem-br` is a blank line; text is in `.lineitem-text`. Syntax highlighting is nested `.hljs-*` spans, so `textContent` reconstructs the source. `readCodeText()` joins lines with `\n` and maps nbsp → space.
-- **Language** is the container's `ns-type` attr (also `block-lang-<lang>`).
+- **Language** (when set) is the container's `ns-type` attr (also `block-lang-<lang>` + `block-codelang`); a language-less block has `ns-type="block"` and none of those.
 - **Inline code** is `INLINE_CODE_SELECTOR = '.lineitem-code'` (an inline span within regular text; not used for block lines, which are `.lineitem-text`). Backreference-footer inline code is a different class, `.tlr-seg-code` — not currently covered.
 
-To re-inspect after a Thymer update: in the debug Chrome console, select a code block in Elements and check `$0.closest('.block-codelang')` and its `ns-type`.
+To re-inspect after a Thymer update: in the debug Chrome console, select a code block in Elements and check `$0.closest('.listitem-block')` and the inner `.block-container-div` (plus its `ns-type`).
 
 **Alternative (more robust against highlight quirks):** the outer `.listitem-block` and each line carry `data-guid`. You could map those back to `PluginLineItem`s via `record.getLineItems()` and read text through the API instead of scraping the DOM. There is also a dedicated `.listview-overlaybuttons` layer if you prefer overlaying buttons outside the contenteditable flow.
 
